@@ -38,6 +38,7 @@ func TestMaximum(t *testing.T) {
 		{[]int{1, 2, 3, 4, 567, 435643276, 1214, 1231243, 34}, 435643276},
 		{[]int{0}, 0},
 		{[]int{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, 1},
+		{nil, 0},
 	}
 	for _, v := range tests {
 		maxTestNum := maximum(v.array)

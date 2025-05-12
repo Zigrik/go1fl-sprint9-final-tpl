@@ -26,8 +26,7 @@ var wg sync.WaitGroup
 func generateRandomElements(size int) []int {
 	// ваш код здесь
 	if size < 1 {
-		err := fmt.Errorf("the number of items to generate cannot be less than 1")
-		log.Println("Error:", err)
+		log.Println("Error: the number of items to generate cannot be less than 1")
 		return []int{}
 	}
 
@@ -45,8 +44,7 @@ func generateRandomElements(size int) []int {
 func maximum(data []int) int {
 	// ваш код здесь
 	if len(data) == 0 {
-		err := fmt.Errorf("the number of elements to search for the maximum must be greater than 0")
-		log.Println("Error:", err)
+		log.Println("Error: the number of elements to search for the maximum must be greater than 0")
 		return 0
 	}
 	return slices.Max(data)
@@ -61,14 +59,23 @@ func maxChunks(data []int) int {
 		return 0
 	}
 	results := make([]int, CHUNKS)
+	//количество активных горутин, которые будут обрабатывать данные.
+	//Количество срезов для работы горутин не может быть больше количества принятых элементов
 	n := min(CHUNKS, len(data))
 
-	for i := 0; i < CHUNKS; i++ {
+	for i := 0; i < n; i++ {
+		//я не стал использовать вариант для вычисления длины среза, предложенный в ТЗ,
+		//т.к. при изменении количества элементов и невозможности разбить слайс на равные срезы будет дополнительная сложность при вычислении
+		//длины каждого среза. Например при количестве элементов в 9 шт. и 8 горутинах округленная длина среза будет равна 1, хотя одна
+		//из горутин должна принять два элемента
+		//
+		//начало каждого среза выбирается путем деления общего количества элементов на количество срезов и умноженое на порядковый номер среза
+		//конец среза, это начало следующего по порядку среза, т.к. при указаный конечный элемент не попадает в текущий срез
+		chunk := data[i*len(data)/n : ((i + 1) * len(data) / n)]
 		wg.Add(1)
 		go func() {
 			if i < n { //cutting off goroutines that have nothing to do
-				chunk := (data[i*len(data)/n : ((i + 1) * len(data) / n)])
-				results[i] = slices.Max(chunk)
+				results[i] = maximum(chunk)
 			}
 			wg.Done()
 		}()
